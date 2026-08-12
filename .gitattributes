@@ -1,3 +1,4 @@
 *.nsi linguist-detectable=false
 *.nsh linguist-detectable=false
 *.css linguist-detectable=false
+*.js  linguist-detectable=false
