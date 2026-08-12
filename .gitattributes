@@ -1,0 +1,3 @@
+*.nsi linguist-vendored
+*.nsh linguist-vendored
+*.css linguist-vendored
