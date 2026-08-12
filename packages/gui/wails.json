@@ -1,0 +1,16 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "HiveLab",
+  "outputfilename": "HiveLab",
+  "build:dir": "../../build",
+  "build:tags": "webkit2_41",
+  "frontend:dir": ".",
+  "frontend:install": "",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Kevin Rodrigues",
+    "email": "kevin_3467@yahoo.com"
+  }
+}

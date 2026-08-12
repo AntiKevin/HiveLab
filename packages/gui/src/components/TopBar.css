@@ -1,0 +1,109 @@
+.top-bar {
+    height: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(22, 222, 232, 0.22);
+    background: #08181c;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    user-select: none;
+}
+
+.window-drag-region {
+    --wails-draggable: drag;
+    height: 100%;
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+}
+
+.app-title {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    color: #f4fdff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.app-title span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.window-actions {
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
+.window-action {
+    width: 46px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    background: transparent;
+    color: #b8dce2;
+    cursor: pointer;
+}
+
+.window-action span {
+    width: 12px;
+    height: 12px;
+    position: relative;
+    display: block;
+}
+
+.window-action:first-child span::before {
+    content: "";
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    bottom: 3px;
+    height: 1.5px;
+    background: currentColor;
+}
+
+.window-action:nth-child(2) span::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border: 1.5px solid currentColor;
+}
+
+.window-action.close span::before,
+.window-action.close span::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 1px;
+    width: 10px;
+    height: 1.5px;
+    background: currentColor;
+}
+
+.window-action.close span::before {
+    transform: rotate(45deg);
+}
+
+.window-action.close span::after {
+    transform: rotate(-45deg);
+}
+
+.window-action:hover {
+    background: rgba(22, 222, 232, 0.12);
+    color: #16dee8;
+}
+
+.window-action.close:hover {
+    background: #d9324e;
+    color: #ffffff;
+}

@@ -1,0 +1,40 @@
+.app-shell {
+    min-height: 100vh;
+    background: #071114;
+    color: #e6fbff;
+    display: flex;
+    flex-direction: column;
+}
+
+.workspace {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    background:
+        linear-gradient(180deg, rgba(22, 222, 232, 0.05), transparent 170px),
+        #071114;
+}
+
+.empty-state {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    color: #d8f8fb;
+}
+
+.empty-state-line {
+    width: 88px;
+    height: 2px;
+    border-radius: 999px;
+    background: #16dee8;
+    box-shadow: 0 0 18px rgba(22, 222, 232, 0.55);
+}
+
+.empty-state h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 800;
+}
