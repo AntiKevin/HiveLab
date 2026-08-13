@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"HiveLab/packages/core"
+	"SmokeLab/packages/core"
 )
 
 // App struct

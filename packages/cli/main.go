@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"HiveLab/packages/core"
+	"SmokeLab/packages/core"
 )
 
 func main() {

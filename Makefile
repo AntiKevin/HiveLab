@@ -3,7 +3,10 @@
 ARGS ?=
 ROOT_DIR := $(CURDIR)
 GUI_DIR := $(ROOT_DIR)/packages/gui
-GO_CACHE ?= /tmp/hivelab-go-build
+GO_CACHE ?= /tmp/smokelab-go-build
+
+install:
+
 
 dev:
 	cd $(GUI_DIR) && GOCACHE=$(GO_CACHE) wails dev $(ARGS)

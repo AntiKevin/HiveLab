@@ -1,6 +1,6 @@
-# HiveLab
+# SmokeLab
 
-HiveLab e uma aplicacao desktop feita com Go, Wails, React, Vite e TypeScript.
+SmokeLab e uma aplicacao desktop feita com Go, Wails, React, Vite e TypeScript.
 O repositorio tambem possui uma entrada de linha de comando para exercitar as
 regras compartilhadas do pacote `core`.
 

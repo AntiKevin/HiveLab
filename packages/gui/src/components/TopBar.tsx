@@ -10,7 +10,7 @@ function TopBar() {
         <header className="top-bar">
             <div className="window-drag-region">
                 <div className="app-title">
-                    <span>HiveLab</span>
+                    <span>SmokeLab</span>
                 </div>
             </div>
 
