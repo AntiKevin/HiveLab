@@ -1,3 +1,3 @@
-- a feature de mocks no core
+- a feature de mocks de serviços http e (futurament serviços de fila)
 - a feature de teste de API, com fixture, payload, url, e mocks
 - a feature de orquestração de nós de mocks e testes de aplicação
