@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"SmokeLab/packages/core"
+	"SmokeLab/packages/engine"
 )
 
 func main() {
@@ -13,5 +13,5 @@ func main() {
 		name = os.Args[1]
 	}
 
-	fmt.Println(core.NewGreetingService().Greet(name))
+	fmt.Println(engine.NewGreetingService().Greet(name))
 }

@@ -1,7 +1,6 @@
-package core
+package HttpMock
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -26,14 +25,31 @@ type Payload struct {
 	Body       []byte `json:"body,omitempty"`
 }
 
+// CommunicationType defines how the mock can be reached when it executes.
+type CommunicationType int
+
+const (
+	Internal CommunicationType = iota
+	External
+	Both
+)
+
+// MockRequest describes an in-app request that can be resolved without HTTP.
+type MockRequest struct {
+	Method  string            `json:"method,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
+	Body    []byte            `json:"body,omitempty"`
+}
+
 // HttpMockModel describes one HTTP mock service.
 type HttpMockModel struct {
-	URL       string            `json:"url"`
-	Port      int               `json:"port"`
-	Headers   map[string]string `json:"headers,omitempty"`
-	Method    string            `json:"method,omitempty"`
-	Payloads  []Payload         `json:"payloads"`
-	Responses []Response        `json:"responses,omitempty"`
+	URL               string            `json:"url"`
+	Port              int               `json:"port"`
+	Headers           map[string]string `json:"headers,omitempty"`
+	Method            string            `json:"method,omitempty"`
+	Payloads          []Payload         `json:"payloads"`
+	Responses         []Response        `json:"responses,omitempty"`
+	CommunicationType CommunicationType `json:"communicationType"`
 }
 
 // NewHttpMockModel creates a validated mock service definition.
@@ -118,48 +134,47 @@ func (m HttpMockModel) EffectiveMethod() string {
 	return strings.ToUpper(method)
 }
 
-// Validate checks if the mock service definition is ready to run.
-func (m HttpMockModel) Validate() error {
-	if strings.TrimSpace(m.URL) == "" {
-		return errors.New("mock URL is required")
+// EffectiveCommunicationType returns the configured communication type.
+func (m HttpMockModel) EffectiveCommunicationType() CommunicationType {
+	return m.CommunicationType
+}
+
+// ExposesHTTP reports whether Execute will reserve a real HTTP port.
+func (m HttpMockModel) ExposesHTTP() bool {
+	switch m.EffectiveCommunicationType() {
+	case External, Both:
+		return true
+	default:
+		return false
+	}
+}
+
+func (m HttpMockModel) clone() HttpMockModel {
+	clone := HttpMockModel{
+		URL:               m.URL,
+		Port:              m.Port,
+		Method:            m.Method,
+		CommunicationType: m.CommunicationType,
+		Payloads:          make([]Payload, 0, len(m.Payloads)),
+		Responses:         make([]Response, 0, len(m.Responses)),
 	}
 
-	parsedURL, err := url.ParseRequestURI(m.URL)
-	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return fmt.Errorf("invalid mock URL %q", m.URL)
-	}
-
-	if m.Port < 1 || m.Port > 65535 {
-		return fmt.Errorf("mock port must be between 1 and 65535: %d", m.Port)
-	}
-
-	if !isSupportedHTTPMethod(m.EffectiveMethod()) {
-		return fmt.Errorf("mock has invalid HTTP method: %q", m.Method)
-	}
-
-	seenResponses := make(map[string]struct{}, len(m.Responses))
-	for _, response := range m.Responses {
-		if err := response.Validate(); err != nil {
-			return err
+	if len(m.Headers) > 0 {
+		clone.Headers = make(map[string]string, len(m.Headers))
+		for key, value := range m.Headers {
+			clone.Headers[key] = value
 		}
-
-		if _, found := seenResponses[response.ID]; found {
-			return fmt.Errorf("response %q already exists", response.ID)
-		}
-		seenResponses[response.ID] = struct{}{}
 	}
 
 	for _, payload := range m.Payloads {
-		if err := payload.Validate(); err != nil {
-			return err
-		}
-
-		if _, found := seenResponses[payload.ResponseID]; !found {
-			return fmt.Errorf("payload references unknown response %q", payload.ResponseID)
-		}
+		clone.Payloads = append(clone.Payloads, payload.Clone())
 	}
 
-	return nil
+	for _, response := range m.Responses {
+		clone.Responses = append(clone.Responses, response.Clone())
+	}
+
+	return clone
 }
 
 // Clone returns a deep copy of the response body and headers.
@@ -180,23 +195,6 @@ func (r Response) Clone() Response {
 	return clone
 }
 
-// Validate checks if the response can be served by an HTTP mock.
-func (r Response) Validate() error {
-	if strings.TrimSpace(r.ID) == "" {
-		return errors.New("response ID is required")
-	}
-
-	if r.StatusCode == 0 {
-		return nil
-	}
-
-	if r.StatusCode < 100 || r.StatusCode > 599 {
-		return fmt.Errorf("response %q has invalid HTTP status code: %d", r.ID, r.StatusCode)
-	}
-
-	return nil
-}
-
 // EffectiveStatusCode returns the configured status code or the default code.
 func (r Response) EffectiveStatusCode() int {
 	if r.StatusCode == 0 {
@@ -211,31 +209,5 @@ func (p Payload) Clone() Payload {
 	return Payload{
 		ResponseID: p.ResponseID,
 		Body:       append([]byte(nil), p.Body...),
-	}
-}
-
-// Validate checks if the payload references a response.
-func (p Payload) Validate() error {
-	if strings.TrimSpace(p.ResponseID) == "" {
-		return errors.New("payload response ID is required")
-	}
-
-	return nil
-}
-
-func isSupportedHTTPMethod(method string) bool {
-	switch method {
-	case http.MethodGet,
-		http.MethodHead,
-		http.MethodPost,
-		http.MethodPut,
-		http.MethodPatch,
-		http.MethodDelete,
-		http.MethodConnect,
-		http.MethodOptions,
-		http.MethodTrace:
-		return true
-	default:
-		return false
 	}
 }

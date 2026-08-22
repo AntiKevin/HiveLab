@@ -2,7 +2,7 @@
 
 SmokeLab e uma aplicacao desktop feita com Go, Wails, React, Vite e TypeScript.
 O repositorio tambem possui uma entrada de linha de comando para exercitar as
-regras compartilhadas do pacote `core`.
+regras compartilhadas do pacote `engine`.
 
 ## Estrutura do projeto
 
@@ -12,7 +12,7 @@ regras compartilhadas do pacote `core`.
 ├── go.mod
 ├── build/
 └── packages/
-    ├── core/  # regras de negocio e codigo compartilhado
+    ├── engine/  # regras de negocio e codigo compartilhado
     ├── cli/   # entrada de linha de comando
     └── gui/   # aplicacao Wails + React + Vite
 ```
@@ -115,7 +115,7 @@ no empacotamento da aplicacao.
 
 ## Rodando a CLI
 
-A CLI usa o pacote `core` diretamente:
+A CLI usa o pacote `engine` diretamente:
 
 ```bash
 make cli
@@ -165,7 +165,7 @@ make gui-build
 
 ## Pacotes
 
-### `packages/core`
+### `packages/engine`
 
 Contem as regras de negocio e codigo compartilhado entre as interfaces do
 projeto. A CLI e a GUI devem consumir esse pacote para evitar duplicacao de
@@ -174,7 +174,7 @@ comportamento.
 ### `packages/cli`
 
 Contem a entrada de linha de comando da aplicacao. Hoje ela le um nome pelos
-argumentos e imprime a saudacao retornada pelo `core`.
+argumentos e imprime a saudacao retornada pelo `engine`.
 
 ### `packages/gui`
 

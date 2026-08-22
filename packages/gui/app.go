@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 
-	"SmokeLab/packages/core"
+	"SmokeLab/packages/engine"
 )
 
 // App struct
 type App struct {
 	ctx             context.Context
-	greetingService *core.GreetingService
+	greetingService *engine.GreetingService
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
-		greetingService: core.NewGreetingService(),
+		greetingService: engine.NewGreetingService(),
 	}
 }
 

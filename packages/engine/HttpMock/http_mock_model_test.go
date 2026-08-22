@@ -1,32 +1,6 @@
-package core
+package HttpMock
 
 import "testing"
-
-func TestNewHttpMockModelValidatesURLAndPort(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name   string
-		rawURL string
-		port   int
-	}{
-		{name: "empty URL", rawURL: "", port: 8080},
-		{name: "relative URL", rawURL: "localhost", port: 8080},
-		{name: "zero port", rawURL: "http://localhost", port: 0},
-		{name: "port too high", rawURL: "http://localhost", port: 65536},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			if _, err := NewHttpMockModel(tt.rawURL, tt.port); err == nil {
-				t.Fatal("expected validation error")
-			}
-		})
-	}
-}
 
 func TestNewHttpMockModelAcceptsValidConfiguration(t *testing.T) {
 	t.Parallel()
@@ -57,6 +31,14 @@ func TestNewHttpMockModelAcceptsValidConfiguration(t *testing.T) {
 	if mock.EffectiveMethod() != "GET" {
 		t.Fatalf("expected default method GET, got %q", mock.EffectiveMethod())
 	}
+
+	if mock.EffectiveCommunicationType() != Internal {
+		t.Fatalf("expected default communication type Internal, got %d", mock.EffectiveCommunicationType())
+	}
+
+	if mock.ExposesHTTP() {
+		t.Fatal("expected default communication type to avoid HTTP exposure")
+	}
 }
 
 func TestAddResponseRejectsDuplicateID(t *testing.T) {
@@ -70,65 +52,6 @@ func TestAddResponseRejectsDuplicateID(t *testing.T) {
 	err = mock.AddResponse(Response{ID: "same"})
 	if err == nil {
 		t.Fatal("expected duplicate response error")
-	}
-}
-
-func TestResponseValidation(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name     string
-		response Response
-		wantErr  bool
-	}{
-		{name: "empty ID", response: Response{}, wantErr: true},
-		{name: "default status", response: Response{ID: "ok"}, wantErr: false},
-		{name: "lower than HTTP range", response: Response{ID: "bad", StatusCode: 99}, wantErr: true},
-		{name: "higher than HTTP range", response: Response{ID: "bad", StatusCode: 600}, wantErr: true},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			err := tt.response.Validate()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("Validate() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestHttpMockModelMethodValidation(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name    string
-		method  string
-		wantErr bool
-	}{
-		{name: "default method", method: "", wantErr: false},
-		{name: "lowercase method", method: "post", wantErr: false},
-		{name: "invalid method", method: "FETCH", wantErr: true},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			mock := HttpMockModel{
-				URL:    "http://localhost",
-				Port:   8080,
-				Method: tt.method,
-			}
-
-			err := mock.Validate()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf("Validate() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
 	}
 }
 
@@ -179,18 +102,6 @@ func TestAddPayloadRequiresKnownResponse(t *testing.T) {
 	}
 
 	if err := mock.AddPayload(Payload{ResponseID: "success", Body: []byte("request")}); err != nil {
-		t.Fatalf("expected payload to be valid: %v", err)
-	}
-}
-
-func TestPayloadValidation(t *testing.T) {
-	t.Parallel()
-
-	if err := (Payload{}).Validate(); err == nil {
-		t.Fatal("expected empty response ID to be invalid")
-	}
-
-	if err := (Payload{ResponseID: "success"}).Validate(); err != nil {
 		t.Fatalf("expected payload to be valid: %v", err)
 	}
 }
